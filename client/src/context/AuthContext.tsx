@@ -70,9 +70,6 @@ export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
     try {
       const response = await registerApi(fname, lname, email, password, isAdmin);
       if (response.ok) {
-        const registerData = await response.json();
-        localStorage.setItem("access_token", registerData.token);
-        setUser(registerData.user);
         alert("Registration successful, please login");
         setError(null);
       } else {
