@@ -26,8 +26,7 @@ function CreateUserModal({ setModal }: CreateUserModalProps) {
       const { fname, lname, email, password } = form;
       const response = await registerApi(fname, lname, email, password);
       if (response.ok) {
-        const registerData = await response.json();
-        localStorage.setItem("access_token", registerData.token);
+        await response.json();
         alert("user creation success!");
         setModal(false);
         setError(null);
