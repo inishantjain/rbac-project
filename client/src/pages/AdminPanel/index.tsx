@@ -55,7 +55,7 @@ function AdminPanel() {
           {users && users.length > 0 && <UserList users={users} setUsers={setUsers} userPerPage={10} />}
         </div>
       </div>
-      {createUserModalShow && <CreateUserModal setModal={setCreateUserModalShow} />}
+      {createUserModalShow && <CreateUserModal getUsers={getUsersHandler} setModal={setCreateUserModalShow} />}
     </>
   );
 }

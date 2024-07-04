@@ -5,9 +5,10 @@ import { registerApi } from "../services/api";
 
 interface CreateUserModalProps {
   setModal: Dispatch<SetStateAction<boolean>>;
+  getUsers: () => Promise<void>; //for refreshing new users
 }
 
-function CreateUserModal({ setModal }: CreateUserModalProps) {
+function CreateUserModal({ setModal, getUsers }: CreateUserModalProps) {
   const [form, setForm] = useState<RegisterFormType>({ email: "", password: "", fname: "", lname: "", isAdmin: false });
   const [loading, setLoading] = useState<boolean>();
   const [error, setError] = useState<null | string>(null);
@@ -27,6 +28,7 @@ function CreateUserModal({ setModal }: CreateUserModalProps) {
       const response = await registerApi(fname, lname, email, password);
       if (response.ok) {
         await response.json();
+        getUsers();
         alert("user creation success!");
         setModal(false);
         setError(null);
