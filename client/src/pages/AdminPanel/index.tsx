@@ -1,15 +1,18 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import UserList from "./UserList";
 import { getUsersApi } from "../../services/api";
 import { User } from "../../types/types";
-import CreateUserModal from "../../components/CreateUserModal";
+import CreateEditUserModal from "./CreateEditUserModal";
 import Spinner from "../../components/Spinner";
+import { useSearchParams } from "react-router-dom";
 
 function AdminPanel() {
   const [users, setUsers] = useState<User[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
-  const [createUserModalShow, setCreateUserModalShow] = useState<boolean>(false);
+
+  const [createEditUserModalShow, setCreateEditUserModal] = useState<boolean>(false);
+  const [, setSearchParams] = useSearchParams();
 
   async function getUsersHandler() {
     setLoading(true);
@@ -30,6 +33,12 @@ function AdminPanel() {
     setLoading(false);
   }
 
+  async function editUserHandler(user: User) {
+    setCreateEditUserModal(true);
+    const { _id: userId, email, fname, lname } = user;
+    setSearchParams({ userId, email, fname, lname }, { replace: true });
+  }
+
   return (
     <>
       <div className="py-6 w-11/12 mx-auto">
@@ -37,7 +46,7 @@ function AdminPanel() {
         <hr />
         <div className="mt-4">
           <button
-            onClick={() => setCreateUserModalShow(true)}
+            onClick={() => setCreateEditUserModal(true)}
             className="text-blue-700 hover:text-white border border-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2"
           >
             Create User
@@ -52,10 +61,22 @@ function AdminPanel() {
         </div>
         {error && <p className="text-center lowercase text-red-600">{error}</p>}
         <div className="mt-8">
-          {users && users.length > 0 && <UserList users={users} setUsers={setUsers} userPerPage={10} />}
+          {users && users.length > 0 && (
+            <UserList users={users} setUsers={setUsers} userPerPage={10} editUserHandler={editUserHandler} />
+          )}
         </div>
       </div>
-      {createUserModalShow && <CreateUserModal getUsers={getUsersHandler} setModal={setCreateUserModalShow} />}
+
+      {/* modal for creating or editing user  */}
+      {createEditUserModalShow && (
+        <CreateEditUserModal
+          getUsers={getUsersHandler}
+          setModal={(state: boolean) => {
+            if (!state) setSearchParams({});
+            setCreateEditUserModal(state);
+          }}
+        />
+      )}
     </>
   );
 }

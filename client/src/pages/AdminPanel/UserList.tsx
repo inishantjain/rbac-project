@@ -9,9 +9,10 @@ type PropType = {
   setUsers: Dispatch<SetStateAction<User[]>>;
   page?: number; //FIXME: pagination is not implemented yet
   userPerPage?: number;
+  editUserHandler: (user: User) => Promise<void>;
 };
 
-const UserList: React.FC<PropType> = ({ users, page = 1, userPerPage = 10, setUsers }) => {
+const UserList: React.FC<PropType> = ({ users, page = 1, userPerPage = 10, setUsers, editUserHandler }) => {
   async function deleteHandler(userId: string) {
     if (!window.confirm("Are you sure you want to delete this user?")) return;
     try {
@@ -26,25 +27,33 @@ const UserList: React.FC<PropType> = ({ users, page = 1, userPerPage = 10, setUs
 
   return (
     <>
-      <Table>
-        <Thead>
+      <Table className="">
+        <Thead className=" text-gray-700 uppercase bg-gray-50">
           <Tr>
-            <Th>S.no</Th>
-            <Th>Name</Th>
+            <Th className="py-5">s.no</Th>
+            <Th>name</Th>
             <Th>email</Th>
-            <Th>Actions</Th>
+            <Th>actions</Th>
           </Tr>
         </Thead>
         <Tbody>
           {users.map((user, idx) => (
-            <Tr key={user._id}>
+            <Tr key={user._id} class="bg-white border-b ">
               <Td>{idx + 1 + userPerPage * (page - 1)}</Td>
-              <Td>{user.fname + " " + user.lname}</Td>
-              <Td>P{user.email}</Td>
+              <Td className="capitalize">{user.fname + " " + user.lname}</Td>
+              <Td>{user.email}</Td>
               <Th>
-                <button className="text-blue-500 underline">Edit</button>
+                <button
+                  onClick={() => editUserHandler(user)}
+                  className="px-3 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300"
+                >
+                  Edit
+                </button>
                 &nbsp;
-                <button onClick={() => deleteHandler(user._id)} className="text-red-400 underline">
+                <button
+                  onClick={() => deleteHandler(user._id)}
+                  className="px-3 py-2 text-sm font-medium text-center  focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 rounded-lg"
+                >
                   delete
                 </button>
               </Th>

@@ -1,17 +1,30 @@
-import { Dispatch, SetStateAction, useState } from "react";
-import Spinner from "./Spinner";
-import { RegisterFormType } from "../types/types";
-import { registerApi } from "../services/api";
+import { useState } from "react";
+import Spinner from "../../components/Spinner";
+import { RegisterFormType } from "../../types/types";
+import { editUserApi, registerApi } from "../../services/api";
+import { useSearchParams } from "react-router-dom";
 
-interface CreateUserModalProps {
-  setModal: Dispatch<SetStateAction<boolean>>;
+interface UserModalProps {
+  setModal: (state: boolean) => void;
   getUsers: () => Promise<void>; //for refreshing new users
 }
 
-function CreateUserModal({ setModal, getUsers }: CreateUserModalProps) {
-  const [form, setForm] = useState<RegisterFormType>({ email: "", password: "", fname: "", lname: "", isAdmin: false });
+function CreateEditUserModal({ setModal, getUsers }: UserModalProps) {
+  const [searchParams] = useSearchParams();
+  const userId = searchParams.get("userId");
+  let modalType: "create" | "edit" = !userId ? "create" : "edit";
+
+  const [form, setForm] = useState<RegisterFormType>({
+    email: searchParams.get("email") || "",
+    password: "",
+    fname: searchParams.get("fname") || "",
+    lname: searchParams.get("lname") || "",
+    isAdmin: false,
+  });
+
   const [loading, setLoading] = useState<boolean>();
   const [error, setError] = useState<null | string>(null);
+
   const handleChange = (evt: React.ChangeEvent<HTMLInputElement>) => {
     const value = evt.target.value;
     setForm({
@@ -25,11 +38,14 @@ function CreateUserModal({ setModal, getUsers }: CreateUserModalProps) {
     setLoading(true);
     try {
       const { fname, lname, email, password } = form;
-      const response = await registerApi(fname, lname, email, password);
+      let response;
+
+      if (modalType === "create") response = await registerApi(fname, lname, email, password);
+      else response = await editUserApi(userId!, fname, lname, email, password);
+
       if (response.ok) {
-        await response.json();
         getUsers();
-        alert("user creation success!");
+        alert(`user ${modalType} success!`);
         setModal(false);
         setError(null);
       } else {
@@ -37,7 +53,7 @@ function CreateUserModal({ setModal, getUsers }: CreateUserModalProps) {
         setError(errorData.message);
       }
     } catch (error: any) {
-      console.error("Error registering:", error);
+      console.error(`Error ${modalType === "create" ? "Creating" : "Editing"} user:`, error);
       setError("An unexpected error occurred." + error?.message);
     }
     setLoading(false);
@@ -139,4 +155,4 @@ function CreateUserModal({ setModal, getUsers }: CreateUserModalProps) {
   );
 }
 
-export default CreateUserModal;
+export default CreateEditUserModal;

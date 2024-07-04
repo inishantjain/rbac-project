@@ -18,16 +18,14 @@ export async function registerApi(fname: string, lname: string, email: string, p
   return res;
 }
 
-export async function editUserApi({ bio, imgUrl = "" }: { bio: string; imgUrl?: string }) {
+export async function editUserApi(userId: string, fname: string, lname: string, email: string, password: string) {
   const res = await fetch(new URL("editUser", BASE_URL), {
     method: "PATCH",
     headers: { authorization: `Bearer ${localStorage.getItem("access_token")!}`, "Content-Type": "application/json" },
     credentials: "include",
-    body: JSON.stringify({ bio, imgUrl }),
+    body: JSON.stringify({ userId, fname, lname, email, password }),
   });
-  const jsonRes = await res.json();
-  if (res.ok) return true;
-  throw new Error("Could not change bio: " + jsonRes?.message);
+  return res;
 }
 
 export async function getUserStateApi() {
