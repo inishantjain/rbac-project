@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import UserList from "./UserList";
 import { getUsersApi } from "../../services/api";
 import { User } from "../../types/types";
@@ -20,7 +20,6 @@ function AdminPanel() {
       const response: Response = await getUsersApi();
       if (response.ok) {
         const users = (await response.json()).users;
-        console.log(users);
         setUsers(users);
         setError(null);
       } else {

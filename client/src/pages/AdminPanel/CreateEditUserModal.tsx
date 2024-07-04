@@ -12,7 +12,7 @@ interface UserModalProps {
 function CreateEditUserModal({ setModal, getUsers }: UserModalProps) {
   const [searchParams] = useSearchParams();
   const userId = searchParams.get("userId");
-  let modalType: "create" | "edit" = !userId ? "create" : "edit";
+  const modalType: "create" | "edit" = !userId ? "create" : "edit";
 
   const [form, setForm] = useState<RegisterFormType>({
     email: searchParams.get("email") || "",

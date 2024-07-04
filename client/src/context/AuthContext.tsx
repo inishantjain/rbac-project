@@ -41,14 +41,13 @@ export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
 
   useEffect(() => {
     if (error) setError(null); //reset error when user switches page
-  }, [location.pathname]);
+  }, []);
 
   const login = async ({ email, password }: LoginFormType) => {
     setLoading(true);
     try {
       const response = await loginApi(email, password);
       if (response.ok) {
-        console.log("ok");
         const loginData = await response.json();
         localStorage.setItem("access_token", loginData.token);
         setUser(loginData.user);

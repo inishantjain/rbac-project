@@ -27,9 +27,9 @@ const UserList: React.FC<PropType> = ({ users, page = 1, userPerPage = 10, setUs
 
   return (
     <>
-      <Table className="">
-        <Thead className=" text-gray-700 uppercase bg-gray-50">
-          <Tr>
+      <Table className="text-start">
+        <Thead className=" text-gray-700 text-start uppercase bg-gray-50">
+          <Tr className="text-start">
             <Th className="py-5">s.no</Th>
             <Th>name</Th>
             <Th>email</Th>
