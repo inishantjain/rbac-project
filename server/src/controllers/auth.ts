@@ -26,7 +26,7 @@ export const login = asyncWrapper(async (req: Request, res: Response) => {
 
   const user = await User.findOne({ email: validatedData.email });
 
-  if (!user || !user.comparePassword(validatedData.password))
+  if (!user || !(await user.comparePassword(validatedData.password)))
     throw new UnAuthenticatedError("Username or Password is incorrect");
 
   const token = await user.createJWT();
