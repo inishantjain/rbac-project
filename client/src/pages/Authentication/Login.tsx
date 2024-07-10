@@ -1,20 +1,18 @@
-import { useState } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { Link } from "react-router-dom";
 import Spinner from "../../components/Spinner";
-import { LoginFormType } from "../../types/types";
+import useForm from "../../hooks/useForm";
 
 const Login = () => {
   const { login, error, loading } = useAuth();
-  const [form, setForm] = useState<LoginFormType>({ email: "", password: "" });
+  const requiredValidate = (val: string) => (val === "" ? "This field is required." : null);
+  const passwordValidate = (val: string) =>
+    val === "" ? "This field is required." : val.length < 6 ? "Password must be at least 6 characters" : null;
 
-  const handleChange = (evt: React.ChangeEvent<HTMLInputElement>) => {
-    const value = evt.target.value;
-    setForm({
-      ...form,
-      [evt.target.name]: value,
-    });
-  };
+  const { values, handleChange, errors, handleSubmit } = useForm(
+    { email: "", password: "" },
+    { email: requiredValidate, password: passwordValidate }
+  );
 
   return (
     <div className="bg-white">
@@ -29,12 +27,7 @@ const Login = () => {
           </div>
 
           <div className="mt-8">
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                login(form);
-              }}
-            >
+            <form onSubmit={handleSubmit(login)}>
               <div>
                 <label htmlFor="email" className="block mb-2 text-sm text-gray-600 ">
                   Email
@@ -42,12 +35,13 @@ const Login = () => {
                 <input
                   type="email"
                   name="email"
-                  value={form.email}
+                  value={values.email}
                   id="email"
                   onChange={handleChange}
-                  placeholder="John"
+                  placeholder="example@example.com"
                   className="block w-full px-4 py-2 mt-2 text-gray-700 placeholder-gray-400 bg-white border border-gray-200 rounded-lg  focus:border-blue-400  focus:ring-blue-400 focus:outline-none focus:ring focus:ring-opacity-40"
                 />
+                {errors.email && <p className="text-sm text-red-500">{errors.email}</p>}
               </div>
 
               <div className="mt-6">
@@ -64,11 +58,12 @@ const Login = () => {
                   type="password"
                   name="password"
                   id="password"
-                  value={form.password}
+                  value={values.password}
                   placeholder="Your Password"
                   onChange={handleChange}
                   className="block w-full px-4 py-2 mt-2 text-gray-700 placeholder-gray-400 bg-white border border-gray-200 rounded-lg  focus:border-blue-400 focus:ring-blue-400 focus:outline-none focus:ring focus:ring-opacity-40"
                 />
+                {errors.password && <p className="text-sm text-red-500">{errors.password}</p>}
               </div>
 
               <div className="mt-6">

@@ -1,31 +1,19 @@
-import { useState } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { Link } from "react-router-dom";
 import Spinner from "../../components/Spinner";
-import { RegisterFormType } from "../../types/types";
+import useForm from "../../hooks/useForm";
 
 const Register = () => {
   const { register, loading, error } = useAuth();
-  const [form, setForm] = useState<RegisterFormType>({ fname: "", lname: "", email: "", password: "", isAdmin: false });
 
-  const handleChange = (evt: React.ChangeEvent<HTMLInputElement>) => {
-    const value = evt.target.value;
-    setForm({
-      ...form,
-      [evt.target.name]: value,
-    });
-  };
+  const requiredValidate = (val: string) => (val === "" ? "This field is required." : null);
+  const passwordValidate = (val: string) =>
+    val === "" ? "This field is required." : val.length < 6 ? "Password must be at least 6 characters" : null;
 
-  const handleFormSubmit = async (evt: React.FormEvent<HTMLFormElement>) => {
-    evt.preventDefault();
-    try {
-      //TODO: validate form
-      await register(form);
-    } catch (error) {
-      alert("some error occurred");
-      console.error(error);
-    }
-  };
+  const { values, handleChange, errors, handleSubmit } = useForm(
+    { fname: "", lname: "", email: "", password: "", isAdmin: false },
+    { fname: requiredValidate, lname: requiredValidate, email: requiredValidate, password: passwordValidate }
+  );
 
   return (
     <div className="bg-white">
@@ -40,7 +28,7 @@ const Register = () => {
           </div>
 
           <div className="mt-8">
-            <form onSubmit={handleFormSubmit}>
+            <form onSubmit={handleSubmit(register)}>
               <div>
                 <label htmlFor="fname" className="block mb-2 text-sm text-gray-600 ">
                   First Name
@@ -49,11 +37,12 @@ const Register = () => {
                   type="text"
                   name="fname"
                   id="fname"
-                  value={form.fname}
+                  value={values.fname}
                   onChange={handleChange}
                   placeholder="John"
                   className="block w-full px-4 py-2 mt-2 text-gray-700 placeholder-gray-400 bg-white border border-gray-200 rounded-lg  focus:border-blue-400  focus:ring-blue-400 focus:outline-none focus:ring focus:ring-opacity-40"
                 />
+                {errors.fname && <p className="text-sm text-red-500">{errors.fname}</p>}
               </div>
               <div>
                 <label htmlFor="lname" className="block mb-2 text-sm text-gray-600 ">
@@ -63,11 +52,12 @@ const Register = () => {
                   type="text"
                   name="lname"
                   id="lname"
-                  value={form.lname}
+                  value={values.lname}
                   onChange={handleChange}
                   placeholder="Smith"
                   className="block w-full px-4 py-2 mt-2 text-gray-700 placeholder-gray-400 bg-white border border-gray-200 rounded-lg focus:border-blue-400 focus:ring-blue-400 focus:outline-none focus:ring focus:ring-opacity-40"
                 />
+                {errors.lname && <p className="text-sm text-red-500">{errors.lname}</p>}
               </div>
               <div>
                 <label htmlFor="email" className="block mb-2 text-sm text-gray-600">
@@ -76,12 +66,13 @@ const Register = () => {
                 <input
                   type="email"
                   name="email"
-                  value={form.email}
+                  value={values.email}
                   onChange={handleChange}
                   id="email"
                   placeholder="example@example.com"
                   className="block w-full px-4 py-2 mt-2 text-gray-700 placeholder-gray-400 bg-white border border-gray-200 rounded-lg focus:border-blue-400 focus:ring-blue-400 focus:outline-none focus:ring focus:ring-opacity-40"
                 />
+                {errors.email && <p className="text-sm text-red-500">{errors.email}</p>}
               </div>
 
               <div>
@@ -95,18 +86,18 @@ const Register = () => {
                   type="password"
                   name="password"
                   id="password"
-                  value={form.password}
+                  value={values.password}
                   onChange={handleChange}
                   placeholder="Your password"
                   className="block w-full px-4 py-2 mt-2 text-gray-700 placeholder-gray-400 bg-white border border-gray-200 rounded-lg  focus:border-blue-400  focus:ring-blue-400 focus:outline-none focus:ring focus:ring-opacity-40"
                 />
+                {errors.password && <p className="text-sm text-red-500">{errors.password}</p>}
               </div>
               <div className="flex items-center mt-2">
                 <input
-                  checked={form.isAdmin}
-                  onChange={(e) => {
-                    setForm((prev) => ({ ...prev, isAdmin: e.target.checked }));
-                  }}
+                  checked={values.isAdmin}
+                  onChange={handleChange}
+                  name="isAdmin"
                   id="isAdmin"
                   type="checkbox"
                   value=""
